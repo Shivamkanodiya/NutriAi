@@ -13,9 +13,9 @@
  */
 
 // ─── FOR LOCAL TESTING ───────────────────────────────────────────────
-window.API_BASE = 'http://localhost:3000';
+//window.API_BASE = 'http://localhost:3000';
 
 // ─── FOR VERCEL DEPLOYMENT ───────────────────────────────────────────
 // Before deploying to Vercel, comment the line above and paste your Render URL:
-// window.API_BASE = 'https://YOUR-RENDER-URL.onrender.com';
+window.API_BASE = 'https://nutriai-sddj.onrender.com';
 // ─────────────────────────────────────────────────────────────────────
