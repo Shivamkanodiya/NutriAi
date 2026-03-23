@@ -4,6 +4,8 @@
  * Frontend JavaScript for the AI Nutrition System
  *
  * Handles:
+ * - Auth: register, login, logout, token management
+ * - Auth guards (redirect to login if no token)
  * - Hamburger mobile navigation
  * - Form submission → API call → redirect to dashboard
  * - Dashboard rendering (stats, charts, food recs, progress)
@@ -12,14 +14,53 @@
  */
 
 // ─── API CONFIGURATION ───────────────────────────────────────────────
-// window.API_BASE is set by config.js (loaded before this script)
-// On Vercel: points to your Render backend URL
-// In local dev: empty string (same-origin)
 const API_BASE = window.API_BASE || '';
 
+// ─── AUTH HELPERS ────────────────────────────────────────────────────
+
+function getToken() {
+  return localStorage.getItem('nutriai_token');
+}
+
+function setToken(token) {
+  localStorage.setItem('nutriai_token', token);
+}
+
+function clearAuth() {
+  localStorage.removeItem('nutriai_token');
+  localStorage.removeItem('nutriai_user');
+  localStorage.removeItem('nutriai_profile');
+  localStorage.removeItem('nutriai_calculation');
+  localStorage.removeItem('nutriai_recommendations');
+}
+
+function getUser() {
+  try {
+    return JSON.parse(localStorage.getItem('nutriai_user') || 'null');
+  } catch { return null; }
+}
+
+/**
+ * Redirects to login if user is not logged in.
+ * Call this at the top of any protected page.
+ */
+function requireAuth() {
+  if (!getToken()) {
+    window.location.href = 'login.html';
+  }
+}
+
+/**
+ * Redirects to home if user IS already logged in.
+ * Call this on login/register pages.
+ */
+function redirectIfLoggedIn() {
+  if (getToken()) {
+    window.location.href = 'index.html';
+  }
+}
 
 // ─── HAMBURGER MOBILE NAV ────────────────────────────────────────────
-
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('nav-links');
 
@@ -30,7 +71,6 @@ if (hamburger && navLinks) {
     hamburger.setAttribute('aria-expanded', isOpen);
   });
 
-  // Close nav when a link is clicked (mobile UX)
   navLinks.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('nav-open');
@@ -39,7 +79,6 @@ if (hamburger && navLinks) {
     });
   });
 
-  // Close nav when clicking outside
   document.addEventListener('click', (e) => {
     if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
       navLinks.classList.remove('nav-open');
@@ -49,56 +88,165 @@ if (hamburger && navLinks) {
   });
 }
 
+// ─── LOGOUT & NAV USER ───────────────────────────────────────────────
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    clearAuth();
+    window.location.href = 'login.html';
+  });
+}
+
+const navUserName = document.getElementById('nav-user-name');
+if (navUserName) {
+  const user = getUser();
+  if (user) navUserName.textContent = `Hi, ${user.name.split(' ')[0]} 👋`;
+}
 
 // ─── UTILITY FUNCTIONS ───────────────────────────────────────────────
-
-/**
- * Makes a fetch request to the backend API.
- */
-async function apiCall(endpoint, method = 'GET', body = null) {
+async function apiCall(endpoint, method = 'GET', body = null, requiresAuth = false) {
   const options = {
     method,
     headers: { 'Content-Type': 'application/json' }
   };
+
+  if (requiresAuth) {
+    const token = getToken();
+    if (token) options.headers['Authorization'] = `Bearer ${token}`;
+  }
+
   if (body) options.body = JSON.stringify(body);
 
   const response = await fetch(`${API_BASE}${endpoint}`, options);
-  if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+  if (response.status === 401) {
+    clearAuth();
+    window.location.href = 'login.html';
+    return;
+  }
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || `API error: ${response.status}`);
+  }
+
   return response.json();
 }
 
-/**
- * Generates a simple userId from user profile data.
- * (No authentication needed — this is a mini project)
- */
-function getUserId() {
-  const profile = JSON.parse(localStorage.getItem('nutriai_profile') || '{}');
-  if (profile.age && profile.gender) {
-    return `user_${profile.age}_${profile.gender}_${profile.weight}`;
+// ─── AUTH ERROR DISPLAY ──────────────────────────────────────────────
+function showAuthError(message) {
+  const el = document.getElementById('auth-error');
+  if (el) {
+    el.textContent = message;
+    el.style.display = 'block';
   }
-  return 'default_user';
 }
 
+function hideAuthError() {
+  const el = document.getElementById('auth-error');
+  if (el) el.style.display = 'none';
+}
+
+// ─── PASSWORD TOGGLE ─────────────────────────────────────────────────
+const passwordToggle = document.getElementById('password-toggle');
+const passwordInput = document.getElementById('password');
+if (passwordToggle && passwordInput) {
+  passwordToggle.addEventListener('click', () => {
+    const isText = passwordInput.type === 'text';
+    passwordInput.type = isText ? 'password' : 'text';
+    passwordToggle.textContent = isText ? '👁️' : '🙈';
+  });
+}
+
+// ─── LOGIN PAGE ───────────────────────────────────────────────────────
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+  redirectIfLoggedIn();
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAuthError();
+
+    const btn = document.getElementById('login-btn');
+    const btnText = btn.querySelector('.btn-text');
+    const btnLoader = btn.querySelector('.btn-loader');
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline-flex';
+    btn.disabled = true;
+
+    try {
+      const result = await apiCall('/api/auth/login', 'POST', {
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      });
+
+      setToken(result.token);
+      localStorage.setItem('nutriai_user', JSON.stringify(result.user));
+      window.location.href = 'index.html';
+
+    } catch (error) {
+      showAuthError(error.message || 'Login failed. Please try again.');
+    } finally {
+      btnText.style.display = 'inline';
+      btnLoader.style.display = 'none';
+      btn.disabled = false;
+    }
+  });
+}
+
+// ─── REGISTER PAGE ───────────────────────────────────────────────────
+const registerForm = document.getElementById('register-form');
+if (registerForm) {
+  redirectIfLoggedIn();
+
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAuthError();
+
+    const btn = document.getElementById('register-btn');
+    const btnText = btn.querySelector('.btn-text');
+    const btnLoader = btn.querySelector('.btn-loader');
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline-flex';
+    btn.disabled = true;
+
+    try {
+      const result = await apiCall('/api/auth/register', 'POST', {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      });
+
+      setToken(result.token);
+      localStorage.setItem('nutriai_user', JSON.stringify(result.user));
+      window.location.href = 'index.html';
+
+    } catch (error) {
+      showAuthError(error.message || 'Registration failed. Please try again.');
+    } finally {
+      btnText.style.display = 'inline';
+      btnLoader.style.display = 'none';
+      btn.disabled = false;
+    }
+  });
+}
 
 // ─── HOME PAGE — FORM HANDLING ───────────────────────────────────────
-
 const nutritionForm = document.getElementById('nutrition-form');
-
 if (nutritionForm) {
+  requireAuth();
+
   nutritionForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const submitBtn = document.getElementById('submit-btn');
     const btnText = submitBtn.querySelector('.btn-text');
     const btnLoader = submitBtn.querySelector('.btn-loader');
-
-    // Show loading state
     btnText.style.display = 'none';
     btnLoader.style.display = 'inline-flex';
     submitBtn.disabled = true;
 
     try {
-      // Collect form data
       const formData = {
         age: document.getElementById('age').value,
         gender: document.getElementById('gender').value,
@@ -109,26 +257,21 @@ if (nutritionForm) {
         condition: document.getElementById('condition').value
       };
 
-      // Call the /api/calculate endpoint
       const calcResult = await apiCall('/api/calculate', 'POST', formData);
-
-      // Call the /api/recommend endpoint
       const recResult = await apiCall('/api/recommend', 'POST', {
         condition: formData.condition,
         goal: formData.goal
       });
 
-      // Store results in localStorage for the dashboard
       localStorage.setItem('nutriai_profile', JSON.stringify(formData));
       localStorage.setItem('nutriai_calculation', JSON.stringify(calcResult.data));
       localStorage.setItem('nutriai_recommendations', JSON.stringify(recResult.data));
 
-      // Redirect to dashboard
       window.location.href = 'dashboard.html';
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Something went wrong. Please check your internet connection and try again.');
+      alert('Something went wrong. Please check your connection and try again.');
     } finally {
       btnText.style.display = 'inline';
       btnLoader.style.display = 'none';
@@ -137,12 +280,10 @@ if (nutritionForm) {
   });
 }
 
-
 // ─── DASHBOARD PAGE — RENDERING ──────────────────────────────────────
-
 const dashboardContent = document.getElementById('dashboard-content');
-
 if (dashboardContent) {
+  requireAuth();
   initDashboard();
 }
 
@@ -152,16 +293,13 @@ async function initDashboard() {
   const profile = JSON.parse(localStorage.getItem('nutriai_profile'));
 
   if (!calcData || !profile) {
-    // Show the "no data" state
     document.getElementById('no-data-state').style.display = 'block';
     return;
   }
 
-  // Hide no-data, show dashboard
   document.getElementById('no-data-state').style.display = 'none';
   dashboardContent.style.display = 'block';
 
-  // Render everything
   renderProfileBar(profile);
   renderStats(calcData);
   renderCharts(calcData);
@@ -170,14 +308,10 @@ async function initDashboard() {
   renderProgressForm();
   await loadProgressHistory();
 
-  // Set today's date in progress form
   document.getElementById('prog-date').valueAsDate = new Date();
   document.getElementById('prog-weight').value = profile.weight;
 }
 
-/**
- * Renders the profile summary bar
- */
 function renderProfileBar(profile) {
   const goalNames = { 'weight-loss': 'Weight Loss', 'maintenance': 'Maintenance', 'muscle-gain': 'Muscle Gain' };
   const condNames = { normal: 'Normal', diabetes: 'Diabetes', hypertension: 'Hypertension' };
@@ -189,9 +323,6 @@ function renderProfileBar(profile) {
     `${actNames[profile.activity]} · ${goalNames[profile.goal]} · ${condNames[profile.condition]}`;
 }
 
-/**
- * Renders the stat cards with animated counters
- */
 function renderStats(data) {
   animateValue('stat-calories', data.dailyCalories, ' kcal');
   animateValue('stat-protein', data.macros.proteinGrams, 'g');
@@ -199,9 +330,6 @@ function renderStats(data) {
   animateValue('stat-fat', data.macros.fatGrams, 'g');
 }
 
-/**
- * Animates a number counting up
- */
 function animateValue(elementId, target, suffix = '') {
   const el = document.getElementById(elementId);
   const duration = 1000;
@@ -213,20 +341,13 @@ function animateValue(elementId, target, suffix = '') {
     const eased = 1 - Math.pow(1 - progress, 3);
     const current = Math.round(target * eased);
     el.textContent = current + suffix;
-
-    if (progress < 1) {
-      requestAnimationFrame(update);
-    }
+    if (progress < 1) requestAnimationFrame(update);
   }
 
   requestAnimationFrame(update);
 }
 
-/**
- * Renders macro breakdown and calorie charts using Chart.js
- */
 function renderCharts(data) {
-  // Macro Doughnut Chart
   const macroCtx = document.getElementById('macro-chart');
   if (macroCtx) {
     new Chart(macroCtx, {
@@ -235,16 +356,8 @@ function renderCharts(data) {
         labels: ['Protein', 'Carbs', 'Fat'],
         datasets: [{
           data: [data.macroRatios.protein, data.macroRatios.carbs, data.macroRatios.fat],
-          backgroundColor: [
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(245, 158, 11, 0.8)'
-          ],
-          borderColor: [
-            'rgba(16, 185, 129, 1)',
-            'rgba(59, 130, 246, 1)',
-            'rgba(245, 158, 11, 1)'
-          ],
+          backgroundColor: ['rgba(16,185,129,0.8)', 'rgba(59,130,246,0.8)', 'rgba(245,158,11,0.8)'],
+          borderColor: ['rgba(16,185,129,1)', 'rgba(59,130,246,1)', 'rgba(245,158,11,1)'],
           borderWidth: 2,
           hoverBorderWidth: 3,
           hoverOffset: 8
@@ -255,25 +368,13 @@ function renderCharts(data) {
         maintainAspectRatio: false,
         cutout: '65%',
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              color: '#94a3b8',
-              padding: 16,
-              font: { family: 'Inter', size: 12 }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => `${ctx.label}: ${ctx.parsed}%`
-            }
-          }
+          legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 16, font: { family: 'Inter', size: 12 } } },
+          tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.parsed}%` } }
         }
       }
     });
   }
 
-  // Calorie Bar Chart
   const calCtx = document.getElementById('calorie-chart');
   if (calCtx) {
     new Chart(calCtx, {
@@ -283,16 +384,8 @@ function renderCharts(data) {
         datasets: [{
           label: 'Calories (kcal)',
           data: [data.bmr, data.tdee, data.dailyCalories],
-          backgroundColor: [
-            'rgba(99, 102, 241, 0.6)',
-            'rgba(139, 92, 246, 0.6)',
-            'rgba(6, 182, 212, 0.6)'
-          ],
-          borderColor: [
-            'rgba(99, 102, 241, 1)',
-            'rgba(139, 92, 246, 1)',
-            'rgba(6, 182, 212, 1)'
-          ],
+          backgroundColor: ['rgba(99,102,241,0.6)', 'rgba(139,92,246,0.6)', 'rgba(6,182,212,0.6)'],
+          borderColor: ['rgba(99,102,241,1)', 'rgba(139,92,246,1)', 'rgba(6,182,212,1)'],
           borderWidth: 2,
           borderRadius: 8,
           borderSkipped: false
@@ -301,32 +394,19 @@ function renderCharts(data) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
+        plugins: { legend: { display: false } },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: '#64748b', font: { family: 'Inter' } }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } }
-          }
+          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { family: 'Inter' } } },
+          x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } } }
         }
       }
     });
   }
 }
 
-/**
- * Renders AI explanations list
- */
 function renderExplanations(explanations) {
   const container = document.getElementById('explanations-list');
   if (!container || !explanations) return;
-
   container.innerHTML = explanations.map(exp =>
     `<div class="explanation-item">
       <div class="explanation-icon">🤖</div>
@@ -335,20 +415,13 @@ function renderExplanations(explanations) {
   ).join('');
 }
 
-/**
- * Renders food recommendation cards
- */
 function renderFoods(recData) {
   if (!recData) return;
-
   const filterEl = document.getElementById('filter-explanation');
-  if (filterEl) {
-    filterEl.textContent = recData.filterExplanation;
-  }
+  if (filterEl) filterEl.textContent = recData.filterExplanation;
 
   const gridEl = document.getElementById('food-grid');
   if (!gridEl) return;
-
   gridEl.innerHTML = recData.recommendations.map(food =>
     `<div class="food-card glass-card">
       <div class="food-name">${food.food_name}</div>
@@ -364,9 +437,6 @@ function renderFoods(recData) {
   ).join('');
 }
 
-/**
- * Sets up the progress tracking form
- */
 function renderProgressForm() {
   const form = document.getElementById('progress-form');
   if (!form) return;
@@ -377,23 +447,20 @@ function renderProgressForm() {
     const submitBtn = document.getElementById('progress-submit-btn');
     const btnText = submitBtn.querySelector('.btn-text');
     const btnLoader = submitBtn.querySelector('.btn-loader');
-
     btnText.style.display = 'none';
     btnLoader.style.display = 'inline-flex';
     submitBtn.disabled = true;
 
     try {
       const calcData = JSON.parse(localStorage.getItem('nutriai_calculation'));
-      const userId = getUserId();
 
       const result = await apiCall('/api/progress', 'POST', {
-        userId,
         date: document.getElementById('prog-date').value,
         caloriesConsumed: document.getElementById('prog-calories').value,
         weight: document.getElementById('prog-weight').value,
         workoutDone: document.getElementById('prog-workout').value === 'yes',
         calorieTarget: calcData ? calcData.dailyCalories : 2000
-      });
+      }, true); // requiresAuth = true
 
       const feedbackEl = document.getElementById('feedback-message');
       feedbackEl.style.display = 'block';
@@ -401,7 +468,6 @@ function renderProgressForm() {
       if (result.data.feedback.shouldAdjust) {
         feedbackEl.className = 'feedback-message feedback-warning';
         feedbackEl.innerHTML = `⚠️ ${result.data.feedback.explanation}`;
-
         if (calcData) {
           calcData.dailyCalories = result.data.feedback.adjustedTarget;
           localStorage.setItem('nutriai_calculation', JSON.stringify(calcData));
@@ -429,42 +495,29 @@ function renderProgressForm() {
   });
 }
 
-/**
- * Loads and displays progress history + weekly summary
- */
 async function loadProgressHistory() {
-  const userId = getUserId();
-
   try {
-    const progressResult = await apiCall(`/api/progress/${userId}`);
+    const progressResult = await apiCall('/api/progress', 'GET', null, true);
     const entries = progressResult.data.entries || [];
 
     if (entries.length > 0) {
       renderProgressHistory(entries);
       renderProgressCharts(entries);
-
-      const weeklyResult = await apiCall(`/api/weekly-summary/${userId}`);
-      if (weeklyResult.data.hasData) {
-        renderWeeklySummary(weeklyResult.data);
-      }
+      const weeklyResult = await apiCall('/api/weekly-summary', 'GET', null, true);
+      if (weeklyResult.data.hasData) renderWeeklySummary(weeklyResult.data);
     }
   } catch (error) {
     console.error('Error loading progress:', error);
   }
 }
 
-/**
- * Renders the progress history table
- */
 function renderProgressHistory(entries) {
   const section = document.getElementById('history-section');
   const tbody = document.getElementById('history-tbody');
   if (!section || !tbody) return;
-
   section.style.display = 'block';
 
   const recent = [...entries].reverse().slice(0, 10);
-
   tbody.innerHTML = recent.map(entry => {
     const met = entry.caloriesConsumed >= entry.calorieTarget * 0.9;
     return `<tr>
@@ -478,9 +531,6 @@ function renderProgressHistory(entries) {
   }).join('');
 }
 
-/**
- * Renders progress charts (calorie tracking & weight tracking)
- */
 let progressCalorieChart = null;
 let progressWeightChart = null;
 
@@ -504,46 +554,11 @@ function renderProgressCharts(entries) {
       data: {
         labels,
         datasets: [
-          {
-            label: 'Consumed',
-            data: caloriesData,
-            borderColor: 'rgba(6, 182, 212, 1)',
-            backgroundColor: 'rgba(6, 182, 212, 0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Target',
-            data: targetData,
-            borderColor: 'rgba(239, 68, 68, 0.7)',
-            borderDash: [5, 5],
-            fill: false,
-            tension: 0,
-            pointRadius: 3
-          }
+          { label: 'Consumed', data: caloriesData, borderColor: 'rgba(6,182,212,1)', backgroundColor: 'rgba(6,182,212,0.1)', fill: true, tension: 0.3, pointRadius: 4, pointHoverRadius: 6 },
+          { label: 'Target', data: targetData, borderColor: 'rgba(239,68,68,0.7)', borderDash: [5,5], fill: false, tension: 0, pointRadius: 3 }
         ]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#94a3b8', font: { family: 'Inter' } }
-          }
-        },
-        scales: {
-          y: {
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: '#64748b' }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { color: '#94a3b8', maxRotation: 45 }
-          }
-        }
-      }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8', maxRotation: 45 } } } }
     });
   }
 
@@ -551,50 +566,16 @@ function renderProgressCharts(entries) {
   if (wtCtx) {
     progressWeightChart = new Chart(wtCtx, {
       type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Weight (kg)',
-          data: weightData,
-          borderColor: 'rgba(139, 92, 246, 1)',
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-          fill: true,
-          tension: 0.3,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#94a3b8', font: { family: 'Inter' } }
-          }
-        },
-        scales: {
-          y: {
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: '#64748b' }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { color: '#94a3b8', maxRotation: 45 }
-          }
-        }
-      }
+      data: { labels, datasets: [{ label: 'Weight (kg)', data: weightData, borderColor: 'rgba(139,92,246,1)', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, pointRadius: 4, pointHoverRadius: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8', maxRotation: 45 } } } }
     });
   }
 }
 
-/**
- * Renders the weekly summary section
- */
 function renderWeeklySummary(data) {
   const section = document.getElementById('weekly-section');
   const card = document.getElementById('weekly-card');
   if (!section || !card) return;
-
   section.style.display = 'block';
 
   const weightChangeColor = data.weightChange < 0 ? '#10b981' : data.weightChange > 0 ? '#ef4444' : '#94a3b8';
@@ -621,7 +602,6 @@ function renderWeeklySummary(data) {
     </div>
     <div class="weekly-insight">
       <strong>📊 AI Insight:</strong> ${data.insight}
-      ${data.adjustedCalorieTarget ? `<br><strong>🔄 Adjusted Target:</strong> ${data.adjustedCalorieTarget} kcal (feedback rule applied)` : ''}
     </div>
     <p style="margin-top: var(--space-md); font-size: 0.8rem; color: var(--text-muted);">
       Period: ${data.period} · ${data.daysTracked} days tracked

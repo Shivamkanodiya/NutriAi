@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to NutriAI - Your personal AI nutrition planner">
+  <title>NutriAI – Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ─── ANIMATED BACKGROUND ─── -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ─── NAVBAR ─── -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🥗</span>
+      <span class="brand-text">Nutri<span class="accent">AI</span></span>
+    </div>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="login.html" class="nav-link active">Login</a>
+      <a href="register.html" class="nav-link">Register</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="container">
+    <section class="auth-section">
+      <div class="auth-card glass-card">
+        <div class="auth-header">
+          <div class="auth-icon">🔐</div>
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">Log in to access your personal nutrition plan</p>
+        </div>
+
+        <!-- Error message -->
+        <div class="auth-error" id="auth-error" style="display:none;"></div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input type="password" id="password" placeholder="Your password" required>
+              <button type="button" class="password-toggle" id="password-toggle" aria-label="Toggle password">👁️</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="login-btn">
+            <span class="btn-text">🚀 Log In</span>
+            <span class="btn-loader" style="display:none;">
+              <span class="spinner"></span> Logging in...
+            </span>
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          Don't have an account? <a href="register.html" class="auth-link">Register here</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>NutriAI — AI-Based Nutrition Recommendation System | College Mini Project</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
