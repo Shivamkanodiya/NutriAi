@@ -17,5 +17,5 @@
 
 // ─── FOR VERCEL DEPLOYMENT ───────────────────────────────────────────
 // Before deploying to Vercel, comment the line above and paste your Render URL:
-window.API_BASE = 'https://nutriai-sddj.onrender.com';
+window.API_BASE = 'https://nutriai-hhsm.onrender.com';
 // ─────────────────────────────────────────────────────────────────────
