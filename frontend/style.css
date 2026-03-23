@@ -1139,3 +1139,145 @@ body {
     padding: var(--space-md) var(--space-sm);
   }
 }
+
+/* ============================================================
+   AUTH PAGES — Login & Register
+   ============================================================ */
+
+.auth-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--nav-height) - 80px);
+  padding: var(--space-xl) 0;
+  animation: fadeInUp 0.5s ease;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-2xl);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.auth-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  display: block;
+}
+
+.auth-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: var(--space-sm);
+}
+
+.auth-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.auth-error {
+  background: rgba(239, 68, 68, 0.12);
+  border-left: 3px solid var(--accent-6);
+  color: #f87171;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-lg);
+  animation: fadeInUp 0.2s ease;
+}
+
+.auth-card .form-group {
+  margin-bottom: var(--space-lg);
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  width: 100%;
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+  line-height: 1;
+}
+
+.password-toggle:hover {
+  color: var(--text-primary);
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.auth-link {
+  color: var(--accent-1);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+}
+
+/* Logout button in nav */
+.btn-logout {
+  padding: var(--space-sm) var(--space-md);
+  min-height: 38px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* User name in nav */
+.nav-user {
+  font-size: 0.85rem;
+  color: var(--accent-3);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .auth-card {
+    padding: var(--space-lg);
+  }
+
+  .auth-title {
+    font-size: 1.5rem;
+  }
+}
+
