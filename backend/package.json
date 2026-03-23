@@ -1,0 +1,20 @@
+{
+  "name": "nutriai-backend",
+  "version": "1.0.0",
+  "description": "AI-Based Nutrition Recommendation System — Backend API (Render)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["nutrition", "ai", "rule-based", "health", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

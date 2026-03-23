@@ -1,0 +1,73 @@
+{
+  "user_20_male_60": {
+    "entries": [
+      {
+        "date": "2026-03-11",
+        "caloriesConsumed": 2000,
+        "weight": 60,
+        "workoutDone": true,
+        "calorieTarget": 2130,
+        "timestamp": "2026-03-11T11:17:19.507Z"
+      }
+    ],
+    "adjustedCalorieTarget": null
+  },
+  "user_20_female_60": {
+    "entries": [
+      {
+        "date": "2026-03-16",
+        "caloriesConsumed": 2000,
+        "weight": 60,
+        "workoutDone": true,
+        "calorieTarget": 2184,
+        "timestamp": "2026-03-16T08:23:30.998Z"
+      },
+      {
+        "date": "2026-03-16",
+        "caloriesConsumed": 1500,
+        "weight": 60,
+        "workoutDone": true,
+        "calorieTarget": 2184,
+        "timestamp": "2026-03-16T08:30:38.770Z"
+      },
+      {
+        "date": "2026-03-16",
+        "caloriesConsumed": 3000,
+        "weight": 63,
+        "workoutDone": true,
+        "calorieTarget": 2184,
+        "timestamp": "2026-03-16T08:31:11.510Z"
+      },
+      {
+        "date": "2026-03-19",
+        "caloriesConsumed": 2000,
+        "weight": 63,
+        "workoutDone": true,
+        "calorieTarget": 2184,
+        "timestamp": "2026-03-16T08:33:50.449Z"
+      }
+    ],
+    "adjustedCalorieTarget": null
+  },
+  "user_20_male_58": {
+    "entries": [
+      {
+        "date": "2026-03-23",
+        "caloriesConsumed": 2000,
+        "weight": 58,
+        "workoutDone": true,
+        "calorieTarget": 2120,
+        "timestamp": "2026-03-23T17:57:14.100Z"
+      },
+      {
+        "date": "2026-03-24",
+        "caloriesConsumed": 2000,
+        "weight": 58,
+        "workoutDone": true,
+        "calorieTarget": 2120,
+        "timestamp": "2026-03-23T17:57:27.403Z"
+      }
+    ],
+    "adjustedCalorieTarget": null
+  }
+}

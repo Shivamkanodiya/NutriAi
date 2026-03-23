@@ -1,0 +1,17 @@
+{
+  "name": "ai-nutrition-system",
+  "version": "1.0.0",
+  "description": "AI-Based Nutrition Recommendation and Progress Tracking System - College Mini Project",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "keywords": ["nutrition", "ai", "rule-based", "health", "mini-project"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI-Based Nutrition Recommendation System - Get personalized calorie targets, macro breakdowns, and food recommendations using rule-based AI.">
+  <title>NutriAI – Smart Nutrition Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ─── ANIMATED BACKGROUND ─── -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ─── HEADER / NAVBAR ─── -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🥗</span>
+      <span class="brand-text">Nutri<span class="accent">AI</span></span>
+    </div>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ─── HERO SECTION ─── -->
+  <main class="container">
+    <section class="hero" id="hero">
+      <div class="hero-badge">🤖 Rule-Based AI Powered</div>
+      <h1 class="hero-title">
+        Smart Nutrition
+        <span class="gradient-text">Recommendation</span>
+        System
+      </h1>
+      <p class="hero-subtitle">
+        Get personalized calorie targets, macro breakdowns, and food recommendations
+        powered by explainable AI rules &amp; the Mifflin–St Jeor equation.
+      </p>
+    </section>
+
+    <!-- ─── USER INPUT FORM ─── -->
+    <section class="form-section" id="input-form-section">
+      <div class="form-card glass-card">
+        <div class="form-header">
+          <h2>📋 Your Profile</h2>
+          <p>Enter your details to get AI-powered nutrition recommendations</p>
+        </div>
+
+        <form id="nutrition-form">
+          <!-- Row 1: Age & Gender -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" name="age" placeholder="e.g. 25" min="10" max="100" required>
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 2: Height & Weight -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="height">Height (cm)</label>
+              <input type="number" id="height" name="height" placeholder="e.g. 175" min="100" max="250" required>
+            </div>
+            <div class="form-group">
+              <label for="weight">Weight (kg)</label>
+              <input type="number" id="weight" name="weight" placeholder="e.g. 70" min="30" max="300" required>
+            </div>
+          </div>
+
+          <!-- Row 3: Activity & Goal -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="activity">Workout Intensity</label>
+              <select id="activity" name="activity" required>
+                <option value="" disabled selected>Select intensity</option>
+                <option value="sedentary">🪑 Sedentary</option>
+                <option value="light">🚶 Light</option>
+                <option value="moderate">🏃 Moderate</option>
+                <option value="heavy">🏋️ Heavy</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="goal">Goal</label>
+              <select id="goal" name="goal" required>
+                <option value="" disabled selected>Select goal</option>
+                <option value="weight-loss">⚡ Weight Loss</option>
+                <option value="maintenance">⚖️ Maintenance</option>
+                <option value="muscle-gain">💪 Muscle Gain</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 4: Medical Condition -->
+          <div class="form-row single">
+            <div class="form-group full-width">
+              <label for="condition">Medical Condition</label>
+              <select id="condition" name="condition" required>
+                <option value="" disabled selected>Select condition</option>
+                <option value="normal">✅ Normal (No Restrictions)</option>
+                <option value="diabetes">🩸 Diabetes</option>
+                <option value="hypertension">❤️ Hypertension</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-primary" id="submit-btn">
+            <span class="btn-text">🚀 Get My Nutrition Plan</span>
+            <span class="btn-loader" style="display: none;">
+              <span class="spinner"></span> Analyzing...
+            </span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ─── DISCLAIMER ─── -->
+    <section class="disclaimer-section">
+      <div class="disclaimer glass-card">
+        <p>
+          ⚠️ <strong>Disclaimer:</strong> This is an educational mini-project tool.
+          It does NOT provide medical advice, diagnosis, or treatment.
+          Always consult a qualified healthcare professional for personalized guidance.
+        </p>
+      </div>
+    </section>
+
+    <!-- ─── FEATURES ─── -->
+    <section class="features" id="features">
+      <h2 class="section-title">How It Works</h2>
+      <div class="features-grid">
+        <div class="feature-card glass-card">
+          <div class="feature-icon">🧮</div>
+          <h3>Mifflin–St Jeor BMR</h3>
+          <p>Scientifically validated equation to calculate your basal metabolic rate based on age, height, weight, and gender.</p>
+        </div>
+        <div class="feature-card glass-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Rule-Based AI</h3>
+          <p>IF-ELSE safety rules for diabetes and hypertension. No black-box ML — every recommendation is explainable.</p>
+        </div>
+        <div class="feature-card glass-card">
+          <div class="feature-icon">🥦</div>
+          <h3>Real Food Data</h3>
+          <p>75+ real-world foods with accurate nutritional values, filtered by your medical condition for safety.</p>
+        </div>
+        <div class="feature-card glass-card">
+          <div class="feature-icon">📊</div>
+          <h3>Progress Tracking</h3>
+          <p>Track daily calories, weight, and workouts. AI adjusts your target if you miss it for 3 consecutive days.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <p>NutriAI — AI-Based Nutrition Recommendation System | College Mini Project</p>
+    <p class="footer-small">Built with Node.js, Express, and Rule-Based AI | Educational Purpose Only</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

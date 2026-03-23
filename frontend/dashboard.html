@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NutriAI Dashboard - View your personalized nutrition plan, track progress, and get AI-powered food recommendations.">
+  <title>NutriAI – Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="dashboard-page">
+  <!-- ─── ANIMATED BACKGROUND ─── -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ─── HEADER ─── -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🥗</span>
+      <span class="brand-text">Nutri<span class="accent">AI</span></span>
+    </div>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="dashboard.html" class="nav-link active">Dashboard</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="container dashboard-container">
+    <!-- ─── NO DATA STATE ─── -->
+    <section class="no-data-state" id="no-data-state">
+      <div class="glass-card" style="text-align:center; padding:3rem;">
+        <h2>📋 No Profile Data Yet</h2>
+        <p style="margin:1rem 0; color: var(--text-secondary);">Fill out the form on the home page to generate your personalized nutrition plan.</p>
+        <a href="index.html" class="btn-primary" style="display:inline-block; text-decoration:none; width:auto; padding: 0.9rem 2rem;">← Go to Home</a>
+      </div>
+    </section>
+
+    <!-- ─── DASHBOARD CONTENT (hidden until data is loaded) ─── -->
+    <div id="dashboard-content" style="display:none;">
+
+      <!-- ─── PROFILE SUMMARY BAR ─── -->
+      <section class="profile-bar glass-card">
+        <div class="profile-info">
+          <span id="profile-summary"></span>
+        </div>
+        <a href="index.html" class="btn-small">✏️ Edit Profile</a>
+      </section>
+
+      <!-- ─── CALORIE & MACRO OVERVIEW ─── -->
+      <h2 class="section-title">📊 Your Daily Targets</h2>
+      <section class="stats-grid">
+        <div class="stat-card glass-card stat-calories">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-value" id="stat-calories">—</div>
+          <div class="stat-label">Daily Calories</div>
+        </div>
+        <div class="stat-card glass-card stat-protein">
+          <div class="stat-icon">🥩</div>
+          <div class="stat-value" id="stat-protein">—</div>
+          <div class="stat-label">Protein (g)</div>
+        </div>
+        <div class="stat-card glass-card stat-carbs">
+          <div class="stat-icon">🍞</div>
+          <div class="stat-value" id="stat-carbs">—</div>
+          <div class="stat-label">Carbs (g)</div>
+        </div>
+        <div class="stat-card glass-card stat-fat">
+          <div class="stat-icon">🥑</div>
+          <div class="stat-value" id="stat-fat">—</div>
+          <div class="stat-label">Fat (g)</div>
+        </div>
+      </section>
+
+      <!-- ─── CHARTS ROW ─── -->
+      <section class="charts-row">
+        <div class="chart-card glass-card">
+          <h3>Macro Breakdown</h3>
+          <div class="chart-wrapper">
+            <canvas id="macro-chart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card glass-card">
+          <h3>Calorie Breakdown</h3>
+          <div class="chart-wrapper">
+            <canvas id="calorie-chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── AI EXPLANATIONS ─── -->
+      <section class="explanations-section">
+        <h2 class="section-title">🤖 AI Rule Explanations</h2>
+        <div class="explanations-card glass-card" id="explanations-list">
+          <!-- Filled by JS -->
+        </div>
+      </section>
+
+      <!-- ─── FOOD RECOMMENDATIONS ─── -->
+      <section class="food-section">
+        <h2 class="section-title">🥦 Recommended Foods</h2>
+        <p class="filter-explanation" id="filter-explanation"></p>
+        <div class="food-grid" id="food-grid">
+          <!-- Filled by JS -->
+        </div>
+      </section>
+
+      <!-- ─── PROGRESS TRACKING ─── -->
+      <section class="progress-section">
+        <h2 class="section-title">📈 Track Your Progress</h2>
+        <div class="progress-form-card glass-card">
+          <form id="progress-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prog-date">Date</label>
+                <input type="date" id="prog-date" required>
+              </div>
+              <div class="form-group">
+                <label for="prog-calories">Calories Consumed</label>
+                <input type="number" id="prog-calories" placeholder="e.g. 1800" min="0" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prog-weight">Current Weight (kg)</label>
+                <input type="number" id="prog-weight" placeholder="e.g. 70" min="20" step="0.1" required>
+              </div>
+              <div class="form-group">
+                <label for="prog-workout">Workout Done?</label>
+                <select id="prog-workout" required>
+                  <option value="yes">✅ Yes</option>
+                  <option value="no">❌ No</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" id="progress-submit-btn">
+              <span class="btn-text">📝 Log Progress</span>
+              <span class="btn-loader" style="display: none;">
+                <span class="spinner"></span> Saving...
+              </span>
+            </button>
+          </form>
+          <!-- Feedback message -->
+          <div class="feedback-message" id="feedback-message" style="display:none;"></div>
+        </div>
+      </section>
+
+      <!-- ─── PROGRESS HISTORY ─── -->
+      <section class="history-section" id="history-section" style="display:none;">
+        <h2 class="section-title">📅 Progress History</h2>
+        <div class="history-table-wrap glass-card">
+          <div class="table-scroll">
+            <table class="history-table" id="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Calories</th>
+                  <th>Target</th>
+                  <th>Weight</th>
+                  <th>Workout</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── PROGRESS CHART ─── -->
+      <section class="progress-chart-section" id="progress-chart-section" style="display:none;">
+        <div class="charts-row">
+          <div class="chart-card glass-card">
+            <h3>Calorie Tracking</h3>
+            <div class="chart-wrapper chart-wide">
+              <canvas id="progress-calorie-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card glass-card">
+            <h3>Weight Tracking</h3>
+            <div class="chart-wrapper chart-wide">
+              <canvas id="progress-weight-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── WEEKLY SUMMARY ─── -->
+      <section class="weekly-section" id="weekly-section" style="display:none;">
+        <h2 class="section-title">📊 Weekly Summary</h2>
+        <div class="weekly-card glass-card" id="weekly-card">
+          <!-- Filled by JS -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <p>NutriAI — AI-Based Nutrition Recommendation System | College Mini Project</p>
+    <p class="footer-small">Built with Node.js, Express, and Rule-Based AI | Educational Purpose Only</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
