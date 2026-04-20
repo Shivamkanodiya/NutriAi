@@ -231,6 +231,172 @@ if (registerForm) {
   });
 }
 
+// ─── REPORT UPLOAD HANDLING ──────────────────────────────────────────
+const reportDropzone = document.getElementById('report-dropzone');
+const reportFileInput = document.getElementById('report-file-input');
+const reportBrowseBtn = document.getElementById('report-browse-btn');
+
+if (reportDropzone && reportFileInput) {
+  let detectedConditionValue = null;
+
+  // Browse button proxy
+  if (reportBrowseBtn) {
+    reportBrowseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      reportFileInput.click();
+    });
+  }
+  
+  // Click on dropzone
+  reportDropzone.addEventListener('click', () => reportFileInput.click());
+
+  // Drag and drop events
+  reportDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    reportDropzone.classList.add('dragover');
+  });
+
+  reportDropzone.addEventListener('dragleave', () => {
+    reportDropzone.classList.remove('dragover');
+  });
+
+  reportDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    reportDropzone.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleReportFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  // File input change
+  reportFileInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleReportFile(e.target.files[0]);
+    }
+  });
+
+  // Reset button
+  const reportResetBtn = document.getElementById('report-reset-btn');
+  if (reportResetBtn) {
+    reportResetBtn.addEventListener('click', resetReportUI);
+  }
+
+  // Apply button
+  const reportApplyBtn = document.getElementById('report-apply-btn');
+  if (reportApplyBtn) {
+    reportApplyBtn.addEventListener('click', () => {
+      if (detectedConditionValue) {
+        const conditionSelect = document.getElementById('condition');
+        if (conditionSelect) {
+          conditionSelect.value = detectedConditionValue;
+          // Visual feedback
+          conditionSelect.style.transition = 'box-shadow 0.3s';
+          conditionSelect.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.4)';
+          setTimeout(() => conditionSelect.style.boxShadow = 'none', 1500);
+          
+          // Scroll to form
+          conditionSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+  }
+
+  async function handleReportFile(file) {
+    if (!window.ReportParser) {
+      alert("ReportParser module not loaded.");
+      return;
+    }
+
+    // UI transitions
+    reportDropzone.style.display = 'none';
+    document.getElementById('report-results').style.display = 'none';
+    
+    const progressWrap = document.getElementById('report-progress-wrap');
+    const progressBar = document.getElementById('report-progress-bar');
+    const progressLabel = document.getElementById('report-progress-label');
+    
+    progressWrap.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressLabel.textContent = 'Preparing file...';
+
+    try {
+      const result = await window.ReportParser.parseReport(file, (percent, msg) => {
+        progressBar.style.width = `${percent}%`;
+        progressLabel.textContent = msg;
+      });
+
+      // Hide progress, show results
+      setTimeout(() => {
+        progressWrap.style.display = 'none';
+        showReportResults(result);
+      }, 500);
+
+    } catch (err) {
+      alert(err.message || 'Failed to parse report');
+      resetReportUI();
+    }
+  }
+
+  function showReportResults(result) {
+    const resultsPanel = document.getElementById('report-results');
+    resultsPanel.style.display = 'block';
+
+    // Condition Box
+    const info = window.ReportParser.getConditionInfo(result.condition);
+    detectedConditionValue = info.value;
+
+    const rcbCond = document.getElementById('rcb-condition');
+    rcbCond.textContent = info.label;
+    rcbCond.style.color = info.color;
+    
+    const rcbBox = document.getElementById('report-condition-box');
+    rcbBox.style.backgroundColor = info.bg;
+    rcbBox.style.borderColor = info.border;
+
+    const rcbConf = document.getElementById('rcb-confidence');
+    rcbConf.textContent = `Confidence: ${result.confidence.toUpperCase()}`;
+    
+    // Extracted Markers
+    const rmpPanel = document.getElementById('report-markers-panel');
+    const rmpMarkers = document.getElementById('rmp-markers');
+    
+    if (result.method === 'ocr') {
+      rmpPanel.style.display = 'block';
+      rmpMarkers.innerHTML = window.ReportParser.formatMarkersHTML(result.markers);
+    } else {
+      rmpPanel.style.display = 'none';
+    }
+
+    // Evidence List
+    const evidenceList = document.getElementById('report-evidence-list');
+    if (result.evidence && result.evidence.length > 0) {
+      evidenceList.innerHTML = '<strong>Reasoning:</strong><ul>' + 
+        result.evidence.map(e => `<li>${e}</li>`).join('') + 
+        '</ul>';
+      evidenceList.style.display = 'block';
+    } else {
+      evidenceList.style.display = 'none';
+    }
+
+    // Method Note (e.g. for PDF)
+    const methodNote = document.getElementById('report-method-note');
+    if (result.note) {
+      methodNote.innerHTML = `⚠️ ${result.note}`;
+      methodNote.style.display = 'block';
+    } else {
+      methodNote.style.display = 'none';
+    }
+  }
+
+  function resetReportUI() {
+    reportFileInput.value = '';
+    detectedConditionValue = null;
+    reportDropzone.style.display = 'flex';
+    document.getElementById('report-progress-wrap').style.display = 'none';
+    document.getElementById('report-results').style.display = 'none';
+  }
+}
+
 // ─── HOME PAGE — FORM HANDLING ───────────────────────────────────────
 const nutritionForm = document.getElementById('nutrition-form');
 if (nutritionForm) {
