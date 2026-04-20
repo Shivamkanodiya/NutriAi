@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NutriAI — Free AI-powered nutrition planner with personalized calorie targets, macro breakdowns, and food recommendations for your health condition.">
+  <title>NutriAI — Smart AI Nutrition Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ══════════════════════════════════════
+       LANDING PAGE — ADDITIONAL STYLES
+       ══════════════════════════════════════ */
+
+    /* ─── LANDING HERO ─── */
+    .landing-hero {
+      min-height: calc(100vh - 65px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .landing-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.6s ease both;
+      letter-spacing: 0.3px;
+    }
+
+    .landing-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #6366f1;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.7; }
+    }
+
+    .landing-title {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+
+    .landing-title-sub {
+      display: block;
+      font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--text-secondary);
+    }
+
+    .landing-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 580px;
+      line-height: 1.7;
+      margin: 0 auto 2.5rem;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .landing-cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s ease 0.3s both;
+      margin-bottom: 3.5rem;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 180px;
+      justify-content: center;
+    }
+
+    .btn-hero-primary::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-hero-primary:hover::before { left: 100%; }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      min-width: 160px;
+      justify-content: center;
+    }
+
+    .btn-hero-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* ─── STATS BAR ─── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      animation: fadeInUp 0.6s ease 0.4s both;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .stat-bar-item {
+      flex: 1;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      border-right: 1px solid var(--glass-border);
+      transition: background 0.3s ease;
+    }
+
+    .stat-bar-item:last-child { border-right: none; }
+    .stat-bar-item:hover { background: rgba(99,102,241,0.08); }
+
+    .stat-bar-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      letter-spacing: -0.5px;
+    }
+
+    .stat-bar-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    /* ─── SECTION WRAPPER ─── */
+    .landing-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+
+    .landing-section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-1);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .landing-section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .landing-section-sub {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-it-works {
+      background: rgba(10, 14, 26, 0.5);
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+      position: relative;
+    }
+
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 3rem;
+      left: calc(16.66% + 1rem);
+      right: calc(16.66% + 1rem);
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      opacity: 0.35;
+    }
+
+    .step-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-number-1 { background: rgba(99,102,241,0.2); color: #818cf8; border: 2px solid rgba(99,102,241,0.4); }
+    .step-number-2 { background: rgba(139,92,246,0.2); color: #a78bfa; border: 2px solid rgba(139,92,246,0.4); }
+    .step-number-3 { background: rgba(6,182,212,0.2); color: #22d3ee; border: 2px solid rgba(6,182,212,0.4); }
+
+    .step-icon {
+      font-size: 2.4rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .step-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .step-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─── FEATURES LANDING ─── */
+    .landing-features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .landing-feature-card {
+      padding: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .landing-feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .lfc-1::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+    .lfc-2::before { background: linear-gradient(90deg, #06b6d4, #3b82f6); }
+    .lfc-3::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
+    .lfc-4::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+    .landing-feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(99,102,241,0.12);
+      border-color: rgba(99,102,241,0.2);
+    }
+
+    .lf-icon {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .lf-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .lf-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .lf-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .lf-badge-purple { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .lf-badge-cyan { background: rgba(6,182,212,0.15); color: #22d3ee; }
+    .lf-badge-green { background: rgba(16,185,129,0.15); color: #34d399; }
+    .lf-badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+    /* ─── TESTIMONIALS ─── */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .testimonial-card {
+      padding: 1.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .testimonial-card:hover { transform: translateY(-3px); }
+
+    .testimonial-stars {
+      color: #f59e0b;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .testimonial-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .testimonial-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .ta-1 { background: rgba(99,102,241,0.2); }
+    .ta-2 { background: rgba(16,185,129,0.2); }
+    .ta-3 { background: rgba(6,182,212,0.2); }
+
+    .testimonial-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .testimonial-role {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── FINAL CTA BANNER ─── */
+    .landing-cta-banner {
+      position: relative;
+      z-index: 1;
+      margin: 0 auto;
+      max-width: 900px;
+      padding: 0 2rem 5rem;
+    }
+
+    .cta-banner-inner {
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.15), rgba(6,182,212,0.1));
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      text-align: center;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner-inner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-banner-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .cta-banner-sub {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    /* ─── LANDING FOOTER ─── */
+    .landing-footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--glass-border);
+      padding: 2.5rem 2rem;
+    }
+
+    .landing-footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .landing-footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .landing-footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .landing-footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .landing-footer-links a:hover { color: var(--text-secondary); }
+
+    .landing-footer-copy {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── FLOATING PARTICLES (decorative) ─── */
+    .landing-particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent-1);
+      opacity: 0.25;
+    }
+
+    .p1 { top: 15%; left: 10%; animation: drift1 18s ease-in-out infinite; background: #6366f1; }
+    .p2 { top: 60%; left: 85%; animation: drift2 22s ease-in-out infinite; background: #06b6d4; }
+    .p3 { top: 80%; left: 25%; animation: drift1 20s ease-in-out infinite reverse; background: #8b5cf6; }
+    .p4 { top: 30%; left: 70%; animation: drift2 16s ease-in-out infinite; background: #10b981; width: 6px; height: 6px; }
+    .p5 { top: 50%; left: 45%; animation: drift1 24s ease-in-out infinite; background: #f59e0b; width: 3px; height: 3px; }
+
+    @keyframes drift1 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(30px, -40px); }
+      66% { transform: translate(-20px, 20px); }
+    }
+
+    @keyframes drift2 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-40px, 30px); }
+      66% { transform: translate(25px, -30px); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .landing-title { letter-spacing: -1px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .steps-grid::before { display: none; }
+      .landing-features-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .landing-footer-inner { flex-direction: column; text-align: center; }
+      .landing-footer-links { justify-content: center; }
+      .cta-banner-inner { padding: 2.5rem 1.5rem; }
+      .stats-bar { flex-direction: column; border-radius: 12px; }
+      .stat-bar-item { border-right: none; border-bottom: 1px solid var(--glass-border); }
+      .stat-bar-item:last-child { border-bottom: none; }
+      .landing-section { padding: 3.5rem 1.25rem; }
+    }
+
+    @media (max-width: 480px) {
+      .landing-hero { padding: 2rem 1.25rem 2rem; min-height: auto; padding-top: 3rem; }
+      .landing-cta-group { flex-direction: column; align-items: center; }
+      .btn-hero-primary, .btn-hero-secondary { width: 100%; max-width: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ─── ANIMATED BACKGROUND ─── -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ─── FLOATING PARTICLES ─── -->
+  <div class="landing-particles">
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+  </div>
+
+  <!-- ─── NAVBAR ─── -->
+  <header class="navbar">
+    <a href="landing.html" class="nav-brand" style="text-decoration:none;">
+      <span class="brand-icon">🥗</span>
+      <span class="brand-text">Nutri<span class="accent">AI</span></span>
+    </a>
+    <nav class="nav-links" id="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="login.html" class="nav-link">Login</a>
+      <a href="register.html" class="btn-hero-primary" style="padding:0.6rem 1.25rem; font-size:0.88rem;">
+        Get Started Free →
+      </a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ─── HERO SECTION ─── -->
+  <section class="landing-hero" id="hero">
+    <div class="landing-badge">
+      <span class="landing-badge-dot"></span>
+      🤖 Rule-Based AI · No Black Box · 100% Explainable
+    </div>
+
+    <h1 class="landing-title">
+      Your Personal
+      <span class="gradient-text">Nutrition AI</span>
+      <span class="landing-title-sub">Tailored to Your Health</span>
+    </h1>
+
+    <p class="landing-subtitle">
+      Upload your medical report, get personalized calorie targets and food recommendations
+      — powered by rule-based AI that explains every decision. Built for real people, not algorithms.
+    </p>
+
+    <div class="landing-cta-group">
+      <a href="register.html" class="btn-hero-primary" id="hero-cta-register">
+        🚀 Get Started — It's Free
+      </a>
+      <a href="login.html" class="btn-hero-secondary" id="hero-cta-login">
+        🔓 Login to Dashboard
+      </a>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" role="list">
+      <div class="stat-bar-item" role="listitem">
+        <span class="stat-bar-num">75+</span>
+        <span class="stat-bar-label">Real Foods</span>
+      </div>
+      <div class="stat-bar-item" role="listitem">
+        <span class="stat-bar-num">3</span>
+        <span class="stat-bar-label">Conditions</span>
+      </div>
+      <div class="stat-bar-item" role="listitem">
+        <span class="stat-bar-num">AI</span>
+        <span class="stat-bar-label">Powered</span>
+      </div>
+      <div class="stat-bar-item" role="listitem">
+        <span class="stat-bar-num">Free</span>
+        <span class="stat-bar-label">Always</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ─── -->
+  <section class="how-it-works" id="how-it-works" aria-label="How NutriAI works">
+    <div class="landing-section" style="padding-top:4rem;padding-bottom:4rem;">
+      <span class="landing-section-label">Simple Process</span>
+      <h2 class="landing-section-title">Three steps to your<br><span class="gradient-text">nutrition plan</span></h2>
+      <p class="landing-section-sub">No complicated setup. Just your details — and our AI does the rest in seconds.</p>
+
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-number step-number-1">1</div>
+          <span class="step-icon">📋</span>
+          <h3 class="step-title">Enter Your Profile</h3>
+          <p class="step-desc">Share your age, height, weight, activity level, and health goal. Optionally upload a medical/lab report for auto-detection of your condition.</p>
+        </div>
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-number step-number-2">2</div>
+          <span class="step-icon">🤖</span>
+          <h3 class="step-title">AI Analyzes & Calculates</h3>
+          <p class="step-desc">Our rule-based AI calculates your BMR using the Mifflin–St Jeor equation, applies medical safety rules for diabetes or hypertension, and builds your plan.</p>
+        </div>
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-number step-number-3">3</div>
+          <span class="step-icon">📊</span>
+          <h3 class="step-title">Track & Adjust</h3>
+          <p class="step-desc">Get your personalized dashboard with daily calorie targets, macro splits, food recommendations, and progress charts. Log daily and let AI adapt your plan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FEATURES ─── -->
+  <section class="landing-section" id="features" aria-label="NutriAI Features">
+    <span class="landing-section-label">What We Offer</span>
+    <h2 class="landing-section-title">Everything you need for<br><span class="gradient-text">smarter nutrition</span></h2>
+    <p class="landing-section-sub">Built with transparency at its core — every recommendation comes with a reason.</p>
+
+    <div class="landing-features-grid">
+      <!-- Feature 1 -->
+      <div class="landing-feature-card lfc-1">
+        <span class="lf-icon">🧮</span>
+        <h3 class="lf-title">Mifflin–St Jeor BMR Engine</h3>
+        <p class="lf-desc">Scientifically validated equation to calculate your Basal Metabolic Rate based on age, height, weight, and gender. Activity multipliers applied for accurate TDEE.</p>
+        <span class="lf-badge lf-badge-purple">Science-backed</span>
+      </div>
+      <!-- Feature 2 -->
+      <div class="landing-feature-card lfc-2">
+        <span class="lf-icon">📄</span>
+        <h3 class="lf-title">Medical Report Scanner</h3>
+        <p class="lf-desc">Upload a lab report image or PDF. Our built-in OCR (Tesseract.js) extracts glucose, cholesterol, and blood pressure values and auto-suggests your medical condition.</p>
+        <span class="lf-badge lf-badge-cyan">OCR Powered</span>
+      </div>
+      <!-- Feature 3 -->
+      <div class="landing-feature-card lfc-3">
+        <span class="lf-icon">🥦</span>
+        <h3 class="lf-title">Condition-Safe Food List</h3>
+        <p class="lf-desc">75+ real-world foods, each tagged for diabetes, hypertension, or normal plans. AI filters and ranks them by your goal — weight loss, maintenance, or muscle gain.</p>
+        <span class="lf-badge lf-badge-green">75+ foods</span>
+      </div>
+      <!-- Feature 4 -->
+      <div class="landing-feature-card lfc-4">
+        <span class="lf-icon">📈</span>
+        <h3 class="lf-title">Smart Progress Tracking</h3>
+        <p class="lf-desc">Log daily calories, weight, and workouts. If you miss your target 3 days in a row, AI automatically adjusts your calorie plan with a clear explanation of why.</p>
+        <span class="lf-badge lf-badge-amber">Auto-adjusts</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TESTIMONIALS ─── -->
+  <section class="how-it-works" aria-label="User testimonials">
+    <div class="landing-section" style="padding-top:4rem;padding-bottom:4rem;">
+      <span class="landing-section-label">Student Reviews</span>
+      <h2 class="landing-section-title">Loved by health-conscious<br><span class="gradient-text">students</span></h2>
+
+      <div class="testimonials-grid">
+        <!-- T1 -->
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"I uploaded my HbA1c report and NutriAI instantly suggested Diabetes mode and gave me a low-sugar meal plan. The OCR feature is incredible!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar ta-1">👨‍🎓</div>
+            <div>
+              <div class="testimonial-name">Arjun Mehta</div>
+              <div class="testimonial-role">Computer Science, 3rd Year</div>
+            </div>
+          </div>
+        </div>
+        <!-- T2 -->
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"The explainable AI is what got me. Every food recommendation has a reason — I actually understand why I'm eating what I'm eating now."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar ta-2">👩‍⚕️</div>
+            <div>
+              <div class="testimonial-name">Priya Sharma</div>
+              <div class="testimonial-role">Biomedical Engineering</div>
+            </div>
+          </div>
+        </div>
+        <!-- T3 -->
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★☆</div>
+          <p class="testimonial-text">"Lost 3 kg in 6 weeks following my NutriAI plan. The progress chart kept me motivated and the auto-adjustment kicked in exactly when I needed it!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar ta-3">🏋️</div>
+            <div>
+              <div class="testimonial-name">Karthik Rao</div>
+              <div class="testimonial-role">Fitness Enthusiast</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FINAL CTA BANNER ─── -->
+  <div class="landing-cta-banner">
+    <div class="cta-banner-inner">
+      <h2 class="cta-banner-title">
+        Ready to eat<br><span class="gradient-text">smarter today?</span>
+      </h2>
+      <p class="cta-banner-sub">
+        Join students and health-conscious individuals who use NutriAI every day.
+        Free forever. No ads. No subscriptions.
+      </p>
+      <div class="landing-cta-group" style="margin-bottom:0;">
+        <a href="register.html" class="btn-hero-primary" id="footer-cta-register">
+          🚀 Create Free Account
+        </a>
+        <a href="login.html" class="btn-hero-secondary" id="footer-cta-login">
+          Already have one? Login →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="landing-footer">
+    <div class="landing-footer-inner">
+      <div class="landing-footer-brand">
+        <span>🥗</span>
+        <span>Nutri<span class="accent">AI</span></span>
+      </div>
+      <div class="landing-footer-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </div>
+      <div class="landing-footer-copy">
+        © 2025 NutriAI · College Mini Project · Educational Purpose Only
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ─── HAMBURGER MOBILE NAV ───────────────────────────────────────────────
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('nav-open');
+        hamburger.classList.toggle('hamburger-open', isOpen);
+        hamburger.setAttribute('aria-expanded', isOpen);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+          navLinks.classList.remove('nav-open');
+          hamburger.classList.remove('hamburger-open');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // ─── SMOOTH SCROLL FOR ANCHOR LINKS ──────────────────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          navLinks.classList.remove('nav-open');
+          hamburger.classList.remove('hamburger-open');
+        }
+      });
+    });
+
+    // ─── INTERSECTION OBSERVER FOR FADE-IN ───────────────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.step-card, .landing-feature-card, .testimonial-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+
+    // ─── REDIRECT LOGGED-IN USERS DIRECTLY TO DASHBOARD ─────────────────────
+    if (localStorage.getItem('nutriai_token')) {
+      const calc = localStorage.getItem('nutriai_calculation');
+      if (calc) {
+        // User has already completed profile — go to dashboard
+        document.getElementById('hero-cta-register').href = 'dashboard.html';
+        document.getElementById('hero-cta-register').textContent = '📊 Go to Dashboard →';
+        document.getElementById('footer-cta-register').href = 'dashboard.html';
+        document.getElementById('footer-cta-register').textContent = '📊 Go to Dashboard →';
+      } else {
+        // Logged in but no profile yet
+        document.getElementById('hero-cta-register').href = 'index.html';
+        document.getElementById('hero-cta-register').textContent = '📋 Complete Profile →';
+        document.getElementById('footer-cta-register').href = 'index.html';
+        document.getElementById('footer-cta-register').textContent = '📋 Complete Profile →';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI-Based Nutrition Recommendation System - Get personalized calorie targets, macro breakdowns, and food recommendations using rule-based AI.">
-  <title>NutriAI – Smart Nutrition Planner</title>
+  <meta name="description" content="AI-Based Nutrition Recommendation System - Set up your profile to get personalized calorie targets, macro breakdowns, and food recommendations.">
+  <title>NutriAI – Profile Setup</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,12 +21,13 @@
 
   <!-- ─── HEADER / NAVBAR ─── -->
   <header class="navbar">
-    <div class="nav-brand">
+    <a href="landing.html" class="nav-brand" style="text-decoration:none;">
       <span class="brand-icon">🥗</span>
       <span class="brand-text">Nutri<span class="accent">AI</span></span>
-    </div>
+    </a>
     <nav class="nav-links" id="nav-links">
-      <a href="index.html" class="nav-link active">Home</a>
+      <a href="landing.html" class="nav-link">Home</a>
+      <a href="index.html" class="nav-link active">Profile</a>
       <a href="dashboard.html" class="nav-link">Dashboard</a>
       <span class="nav-user" id="nav-user-name"></span>
       <button class="btn-logout" id="logout-btn">🚪 Logout</button>
@@ -49,6 +50,80 @@
         Get personalized calorie targets, macro breakdowns, and food recommendations
         powered by explainable AI rules &amp; the Mifflin–St Jeor equation.
       </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         REPORT UPLOAD SECTION
+         ═══════════════════════════════════════════════ -->
+    <section class="report-upload-section" id="report-upload-section">
+      <div class="report-upload-card glass-card">
+
+        <!-- Header -->
+        <div class="report-header">
+          <div class="report-header-icon">📄</div>
+          <div>
+            <h2 class="report-header-title">Upload Medical Report <span class="report-optional-badge">Optional</span></h2>
+            <p class="report-header-sub">Upload a lab report or blood test image — our AI will read it and auto-suggest your Medical Condition below.</p>
+          </div>
+        </div>
+
+        <!-- Info note -->
+        <div class="report-info-note">
+          <span>ℹ️</span>
+          <span>Works best with JPG/PNG photos of lab reports. Reads markers like Blood Glucose, HbA1c, Blood Pressure, and Cholesterol. PDF support uses filename hints only. You'll confirm before anything is applied.</span>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="report-dropzone" id="report-dropzone" role="button" tabindex="0" aria-label="Drop or click to upload a medical report">
+          <div class="report-dropzone-icon" id="dropzone-icon">📂</div>
+          <div class="report-dropzone-text" id="dropzone-text">
+            <strong>Drop your lab report here</strong><br>
+            <span>or click to browse — JPG, PNG, PDF accepted</span>
+          </div>
+          <input type="file" id="report-file-input" accept=".jpg,.jpeg,.png,.pdf,.webp" style="display:none;" aria-label="Choose file">
+          <button class="report-browse-btn" id="report-browse-btn" type="button">Browse Files</button>
+        </div>
+
+        <!-- Progress Bar (hidden until upload) -->
+        <div class="report-progress-wrap" id="report-progress-wrap" style="display:none;">
+          <div class="report-progress-label" id="report-progress-label">Initializing…</div>
+          <div class="report-progress-track">
+            <div class="report-progress-bar" id="report-progress-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Results Panel (hidden until complete) -->
+        <div class="report-results" id="report-results" style="display:none;">
+
+          <!-- Suggested Condition -->
+          <div class="report-condition-box" id="report-condition-box">
+            <div class="rcb-left">
+              <div class="rcb-label">AI Suggested Condition</div>
+              <div class="rcb-condition" id="rcb-condition">—</div>
+              <div class="rcb-confidence" id="rcb-confidence"></div>
+            </div>
+            <button class="report-apply-btn" id="report-apply-btn" type="button">
+              ✅ Apply to Form
+            </button>
+          </div>
+
+          <!-- Extracted Markers -->
+          <div class="report-markers-panel" id="report-markers-panel">
+            <div class="rmp-title">📊 Extracted Health Markers</div>
+            <div class="rmp-markers" id="rmp-markers"></div>
+          </div>
+
+          <!-- Evidence list -->
+          <div class="report-evidence-list" id="report-evidence-list"></div>
+
+          <!-- Note if PDF / filename only -->
+          <div class="report-method-note" id="report-method-note" style="display:none;"></div>
+
+          <!-- Reset link -->
+          <button class="report-reset-btn" id="report-reset-btn" type="button">↩ Upload a different file</button>
+        </div>
+
+      </div>
     </section>
 
     <!-- ─── USER INPUT FORM ─── -->
@@ -181,6 +256,7 @@
   </footer>
 
   <script src="config.js"></script>
+  <script src="report-parser.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

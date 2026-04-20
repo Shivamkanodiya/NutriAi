@@ -1281,3 +1281,385 @@ body {
   }
 }
 
+/* ============================================================
+   REPORT UPLOAD SECTION
+   ============================================================ */
+
+.report-upload-section {
+  max-width: 700px;
+  margin: 0 auto var(--space-xl);
+  animation: fadeInUp 0.6s ease 0.25s both;
+}
+
+.report-upload-card {
+  padding: var(--space-xl);
+}
+
+/* ─── Header ─── */
+.report-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.report-header-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.report-header-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.report-optional-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.15rem 0.55rem;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 50px;
+  vertical-align: middle;
+}
+
+.report-header-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Info note ─── */
+.report-info-note {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-lg);
+}
+
+.report-info-note span:first-child {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+/* ─── Drop Zone ─── */
+.report-dropzone {
+  border: 2px dashed rgba(99, 102, 241, 0.3);
+  border-radius: var(--radius-md);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: rgba(99, 102, 241, 0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  outline: none;
+}
+
+.report-dropzone:hover,
+.report-dropzone:focus,
+.report-dropzone.drag-over {
+  border-color: var(--accent-1);
+  background: rgba(99, 102, 241, 0.1);
+  transform: scale(1.01);
+}
+
+.report-dropzone.drag-over {
+  border-color: var(--accent-3);
+  background: rgba(6, 182, 212, 0.1);
+}
+
+.report-dropzone-icon {
+  font-size: 2.8rem;
+  transition: transform var(--transition-base);
+}
+
+.report-dropzone:hover .report-dropzone-icon,
+.report-dropzone.drag-over .report-dropzone-icon {
+  transform: scale(1.15);
+}
+
+.report-dropzone-text {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.report-dropzone-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.report-browse-btn {
+  padding: 0.55rem 1.25rem;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-xs);
+}
+
+.report-browse-btn:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: var(--accent-1);
+}
+
+/* ─── Progress Bar ─── */
+.report-progress-wrap {
+  margin-top: var(--space-lg);
+}
+
+.report-progress-label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.report-progress-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.report-progress-bar {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 50px;
+  transition: width 0.3s ease;
+  min-width: 4px;
+}
+
+/* ─── Results Panel ─── */
+.report-results {
+  margin-top: var(--space-lg);
+  animation: fadeInUp 0.4s ease;
+}
+
+/* ─── Condition Box ─── */
+.report-condition-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: rgba(30, 41, 59, 0.5);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.rcb-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rcb-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.rcb-condition {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.rcb-confidence {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 0.1rem;
+}
+
+.confidence-high  { color: var(--accent-4); }
+.confidence-medium { color: var(--accent-5); }
+.confidence-low   { color: var(--text-muted); }
+
+/* Apply button */
+.report-apply-btn {
+  padding: 0.7rem 1.4rem;
+  background: var(--gradient-cool);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.report-apply-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.35);
+}
+
+.report-apply-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Markers Panel ─── */
+.report-markers-panel {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.rmp-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.rmp-markers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-sm);
+}
+
+.extracted-marker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  gap: var(--space-sm);
+}
+
+.marker-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.marker-value {
+  color: var(--accent-3);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ─── Evidence List ─── */
+.report-evidence-list {
+  margin-bottom: var(--space-md);
+}
+
+.report-evidence-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  padding: 0.35rem 0;
+  line-height: 1.5;
+}
+
+.report-evidence-item::before {
+  content: '→';
+  color: var(--accent-1);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── Method Note (PDF / filename) ─── */
+.report-method-note {
+  padding: 0.75rem 1rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid var(--accent-5);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--accent-5);
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+}
+
+/* ─── Applied Highlight on Condition Dropdown ─── */
+.condition-applied #condition {
+  border-color: var(--accent-4);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: pulse-green 0.6s ease;
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+  50%       { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.1); }
+}
+
+/* ─── Reset Button ─── */
+.report-reset-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  transition: color var(--transition-fast);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.report-reset-btn:hover {
+  color: var(--text-secondary);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .report-condition-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .report-apply-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .rmp-markers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .rmp-markers {
+    grid-template-columns: 1fr;
+  }
+}
