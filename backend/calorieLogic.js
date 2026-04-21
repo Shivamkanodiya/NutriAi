@@ -32,17 +32,15 @@ const GOAL_ADJUSTMENTS = {
   'muscle-gain': 300
 };
 
-// MACRO RATIOS BY CONDITION & GOAL (Rule-Based AI)
-// IF condition = Diabetes → fixed macro split to manage blood sugar
-// IF condition = Hypertension → fixed macro split to manage blood pressure
-// IF condition = Normal → macro split depends on goal
-const MACRO_RULES = {
-  diabetes: { protein: 0.30, carbs: 0.40, fat: 0.30 },
-  hypertension: { protein: 0.25, carbs: 0.45, fat: 0.30 },
+// MULTIPLIERS FOR PROTEIN (g per kg) AND FAT (g per kg) (Bodyweight-Based AI)
+// The Gold Standard method: Protein and Fat calculated by bodyweight, Carbs fill the remainder
+const BODYWEIGHT_RULES = {
+  diabetes: { proteinMultiplier: 1.8, fatMultiplier: 1.0 },
+  hypertension: { proteinMultiplier: 1.6, fatMultiplier: 1.0 },
   normal: {
-    'weight-loss': { protein: 0.30, carbs: 0.40, fat: 0.30 },
-    'maintenance': { protein: 0.25, carbs: 0.50, fat: 0.25 },
-    'muscle-gain': { protein: 0.30, carbs: 0.50, fat: 0.20 }
+    'weight-loss': { proteinMultiplier: 2.0, fatMultiplier: 1.0 },
+    'maintenance': { proteinMultiplier: 1.6, fatMultiplier: 1.0 },
+    'muscle-gain': { proteinMultiplier: 2.2, fatMultiplier: 1.0 }
   }
 };
 
@@ -134,43 +132,60 @@ function applyMedicalSafetyRules(calories, condition) {
 }
 
 /**
- * getMacroRatios
- * Returns macro-nutrient ratios based on medical condition and goal.
+ * calculateMacros
+ * Converts calorie targets to gram values using the Bodyweight-Based Approach.
  *
- * RULE-BASED AI LOGIC:
- * IF condition is diabetes → use diabetes-specific ratios
- * ELSE IF condition is hypertension → use hypertension-specific ratios
- * ELSE → use goal-based ratios for normal users
- *
+ * @param {number} calories - Daily calorie target
+ * @param {number} weight - User weight in kg
  * @param {string} condition - Medical condition
- * @param {string} goal - Fitness goal
- * @returns {Object} { protein, carbs, fat } ratios (0-1)
+ * @param {string} goal - User fitness goal
+ * @returns {Object} { proteinGrams, carbGrams, fatGrams }
  */
-function getMacroRatios(condition, goal) {
-  if (condition === 'diabetes') {
-    return MACRO_RULES.diabetes;
-  } else if (condition === 'hypertension') {
-    return MACRO_RULES.hypertension;
-  } else {
-    return MACRO_RULES.normal[goal] || MACRO_RULES.normal['maintenance'];
+function calculateMacros(calories, weight, condition, goal) {
+  let rules;
+  if (condition === 'diabetes') rules = BODYWEIGHT_RULES.diabetes;
+  else if (condition === 'hypertension') rules = BODYWEIGHT_RULES.hypertension;
+  else rules = BODYWEIGHT_RULES.normal[goal] || BODYWEIGHT_RULES.normal['maintenance'];
+
+  // Base calculation on body weight (g per kg)
+  let proteinGrams = Math.round(weight * rules.proteinMultiplier);
+  let fatGrams = Math.round(weight * rules.fatMultiplier);
+
+  const proteinCals = proteinGrams * KCAL_PER_GRAM.protein;
+  const fatCals = fatGrams * KCAL_PER_GRAM.fat;
+
+  // Safeguard: Ensure protein and fat don't exceed calorie budget (leaves ~15% for trace carbs)
+  if (proteinCals + fatCals >= calories) {
+    const availableCals = calories * 0.85;
+    const scaleFactor = availableCals / (proteinCals + fatCals);
+    proteinGrams = Math.floor(proteinGrams * scaleFactor);
+    fatGrams = Math.floor(fatGrams * scaleFactor);
   }
+
+  // Carbs fill the complete remainder
+  const remainingCals = calories - (proteinGrams * KCAL_PER_GRAM.protein) - (fatGrams * KCAL_PER_GRAM.fat);
+  const carbGrams = Math.floor(remainingCals / KCAL_PER_GRAM.carbs);
+
+  return { proteinGrams, carbGrams, fatGrams };
 }
 
 /**
- * calculateMacros
- * Converts calorie targets to gram values for each macronutrient.
+ * getMacroRatios
+ * Dynamically computes exact percentage ratios from grammatical split for the UI.
  *
- * Formula: grams = (calories × ratio) / kcal_per_gram
- *
- * @param {number} calories - Daily calorie target
- * @param {Object} ratios - { protein, carbs, fat } ratios
- * @returns {Object} { proteinGrams, carbGrams, fatGrams }
+ * @param {Object} macros - Calculated gram targets
+ * @returns {Object} { protein, carbs, fat } ratio decimals
  */
-function calculateMacros(calories, ratios) {
+function getMacroRatios(macros) {
+  const proteinCals = macros.proteinGrams * KCAL_PER_GRAM.protein;
+  const carbCals = macros.carbGrams * KCAL_PER_GRAM.carbs;
+  const fatCals = macros.fatGrams * KCAL_PER_GRAM.fat;
+  const actualTotal = proteinCals + carbCals + fatCals;
+
   return {
-    proteinGrams: Math.round((calories * ratios.protein) / KCAL_PER_GRAM.protein),
-    carbGrams: Math.round((calories * ratios.carbs) / KCAL_PER_GRAM.carbs),
-    fatGrams: Math.round((calories * ratios.fat) / KCAL_PER_GRAM.fat)
+    protein: proteinCals / actualTotal,
+    carbs: carbCals / actualTotal,
+    fat: fatCals / actualTotal
   };
 }
 
@@ -201,9 +216,9 @@ function generateExplanation(params) {
   }
 
   if (params.condition === 'diabetes') {
-    explanations.push('Medical rule: Diabetes detected — enforcing minimum 1500 kcal and balanced macro split (30% protein, 40% carbs, 30% fat)');
+    explanations.push('Medical rule: Diabetes detected — enforcing minimum 1500 kcal. Macros custom-calculated by bodyweight for safely managing blood sugar.');
   } else if (params.condition === 'hypertension') {
-    explanations.push('Medical rule: Hypertension detected — applying heart-healthy macro split (25% protein, 45% carbs, 30% fat)');
+    explanations.push('Medical rule: Hypertension detected — ensuring safe minimum calories and custom bodyweight-based macros for heart health.');
   }
 
   explanations.push(`Final daily target: ${Math.round(params.finalCalories)} kcal`);
@@ -233,11 +248,11 @@ function calculateAll(userInput) {
   // Step 4: Apply medical safety rules (Rule-Based AI)
   const finalCalories = applyMedicalSafetyRules(adjustedCalories, condition);
 
-  // Step 5: Get macro ratios based on condition/goal (Rule-Based AI)
-  const macroRatios = getMacroRatios(condition, goal);
+  // Step 5: Convert calorie targets to grams using scientific Bodyweight method
+  const macros = calculateMacros(finalCalories, weight, condition, goal);
 
-  // Step 6: Convert calorie targets to grams
-  const macros = calculateMacros(finalCalories, macroRatios);
+  // Step 6: Get exact percentage ratios for the frontend UI charts
+  const macroRatios = getMacroRatios(macros);
 
   // Step 7: Generate human-readable explanations
   const explanations = generateExplanation({

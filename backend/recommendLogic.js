@@ -115,7 +115,7 @@ function scoreAndRank(foods) {
  * @param {number} topN - Number of recommendations (default 10)
  * @returns {Object} { recommendations, filterExplanation }
  */
-function getRecommendations(condition, goal, topN = 10) {
+function getRecommendations(condition, goal, topN = 20) {
   const allFoods = loadFoods();
 
   // Step 1: Apply rule-based condition filter
